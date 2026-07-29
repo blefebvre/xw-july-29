@@ -85,6 +85,12 @@
     ]
   },
   {
+    "id": "tabs-minimal",
+    "components": [
+      "tabs-minimal-item"
+    ]
+  },
+  {
     "id": "tabs",
     "components": [
       "tabs-item"

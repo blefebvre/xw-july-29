@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "url": "https://www.dianalefebvre.ca/",
+  "path": "index",
+  "timestamp": "2026-07-29T14:44:40.424Z",
+  "title": "About",
+  "template": "homepage",
+  "blocks": [
+    "tabs-minimal"
+  ]
+}

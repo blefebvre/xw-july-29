@@ -1,0 +1,41 @@
+{
+  "variantName": "tabs-minimal",
+  "baseBlock": "tabs",
+  "version": "1.0.0",
+  "created": "2026-07-29T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.dianalefebvre.ca/",
+    "originPage": "single-page therapist website homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "minimal",
+    "purpose": "content-nav",
+    "imagePattern": "icon"
+  },
+  "contentPattern": {
+    "structure": "tab-nav + per-tab (heading + richtext + optional image)",
+    "tabCount": 4,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "single-page sites that segment prose into labeled sections",
+      "About/Practice/Fees/Contact style informational tabs",
+      "text-heavy tabbed content with an optional per-tab image"
+    ],
+    "notSuitableFor": [
+      "dark-themed tab sets",
+      "tabs that require a distinct section background",
+      "image-gallery or carousel-style switching"
+    ]
+  },
+  "usage": {
+    "pagesUsing": [
+      "/index"
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-29T00:00:00.000Z"
+  }
+}
