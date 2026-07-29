@@ -1,0 +1,70 @@
+{
+  "definitions": [
+    {
+      "title": "Hero Intro",
+      "id": "hero-intro",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Hero Intro",
+              "filter": "hero-intro"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Hero Intro Item",
+      "id": "hero-intro-item",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block/item",
+            "template": {
+              "name": "Image",
+              "model": "hero-intro-item"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "hero-intro-item",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Image",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "imageAlt",
+          "label": "Alt",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "name": "text",
+          "value": "",
+          "label": "Text",
+          "valueType": "string"
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "hero-intro",
+      "components": [
+        "hero-intro-item"
+      ]
+    }
+  ]
+}

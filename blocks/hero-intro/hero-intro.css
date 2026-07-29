@@ -1,0 +1,92 @@
+/* Block: hero-intro -- values extracted from source computed styles @1440 */
+
+/* Section is "secondary" (light grey) -- bg handled by section styles.
+   Source header uses 128px vertical padding; add it on the wrapper. */
+.hero-intro-container .hero-intro-wrapper {
+  padding-top: 128px;
+  padding-bottom: 128px;
+}
+
+.hero-intro {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2xl); /* 48px between stacked text + images on mobile */
+  align-items: center;
+}
+
+/* ---- Text column ---- */
+.hero-intro .hero-intro-text {
+  display: block;
+}
+
+.hero-intro .hero-intro-text h1 {
+  margin: 0;
+  font-size: var(--heading-size-xxl); /* 56px */
+  line-height: 61.6px;
+  letter-spacing: -1.12px;
+  text-transform: uppercase;
+  color: var(--color-black);
+}
+
+.hero-intro .hero-intro-text p {
+  margin: 24px 0 0;
+  font-size: var(--heading-size-s); /* 18px */
+  line-height: 28.8px;
+  color: var(--color-black);
+}
+
+/* ---- CTA actions row ---- */
+.hero-intro .hero-intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.hero-intro .hero-intro-actions .button-container {
+  margin: 0;
+}
+
+.hero-intro .hero-intro-actions a.button:any-link {
+  margin: 0;
+  padding: 12px 24px;
+  border: 2px solid var(--color-black);
+  border-radius: 9999px;
+  font-size: var(--body-font-size-s); /* 14px */
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* Primary: solid black (default). Secondary: white/outline. */
+.hero-intro .hero-intro-actions a.button.secondary:any-link {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+/* ---- Image cluster ---- */
+.hero-intro .hero-intro-images {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.hero-intro .hero-intro-image {
+  margin: 0;
+}
+
+.hero-intro .hero-intro-image picture,
+.hero-intro .hero-intro-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+@media (width >= 900px) {
+  .hero-intro {
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+}

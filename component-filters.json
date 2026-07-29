@@ -28,9 +28,27 @@
     ]
   },
   {
+    "id": "accordion-faq",
+    "components": [
+      "accordion-faq-item"
+    ]
+  },
+  {
     "id": "accordion",
     "components": [
       "accordion-item"
+    ]
+  },
+  {
+    "id": "cards-article",
+    "components": [
+      "card"
+    ]
+  },
+  {
+    "id": "cards-gallery",
+    "components": [
+      "card"
     ]
   },
   {
@@ -46,6 +64,21 @@
     ]
   },
   {
+    "id": "columns-feature",
+    "components": [
+      "column"
+    ]
+  },
+  {
+    "id": "column",
+    "components": [
+      "text",
+      "image",
+      "button",
+      "title"
+    ]
+  },
+  {
     "id": "columns",
     "components": [
       "column"
@@ -58,6 +91,12 @@
       "image",
       "button",
       "title"
+    ]
+  },
+  {
+    "id": "hero-intro",
+    "components": [
+      "hero-intro-item"
     ]
   },
   {
@@ -88,6 +127,12 @@
     "id": "tabs-minimal",
     "components": [
       "tabs-minimal-item"
+    ]
+  },
+  {
+    "id": "tabs-testimonial",
+    "components": [
+      "tabs-testimonial-item"
     ]
   },
   {

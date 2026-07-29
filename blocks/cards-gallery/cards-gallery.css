@@ -1,0 +1,57 @@
+/* Block: cards-gallery — image gallery, values extracted from source computed styles */
+
+.cards-gallery > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+/* Each card is a square, rounded, clipped image tile */
+.cards-gallery > ul > li {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: var(--background-secondary);
+}
+
+/* No captions/text in this gallery — collapse empty body cells */
+.cards-gallery .cards-gallery-card-body {
+  display: none;
+}
+
+.cards-gallery .cards-gallery-card-image {
+  line-height: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cards-gallery .cards-gallery-card-image picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cards-gallery > ul > li img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+/* Tablet: 2 columns */
+@media (width >= 600px) {
+  .cards-gallery > ul {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop: 4 columns */
+@media (width >= 900px) {
+  .cards-gallery > ul {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

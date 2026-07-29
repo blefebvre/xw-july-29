@@ -1,20 +1,136 @@
+/*
+ * WKND Trendsetters footer — values measured from source at 1440x900.
+ * Reuses the already-loaded Syncopate + Instrument Sans webfonts (brand.css).
+ */
+
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  background-color: #000;
+  color: #fff;
 }
 
-footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+footer .footer-inner {
+  padding: 80px 0;
 }
 
-footer .footer p {
+/* 4-column grid: 252px cols, 48px gap, 1152px content centered (144px gutters @1440) */
+footer .footer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 252px);
+  gap: 48px;
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+footer .footer-column {
+  min-width: 0;
+}
+
+/* ---- Brand column ---- */
+footer .footer-brand-link {
+  display: inline-block;
+  color: #fff;
+  text-decoration: none;
+}
+
+footer .footer-logo {
+  width: 32px;
+  height: 32px;
+  display: block;
+
+  /* SVG is referenced via <img> (isolated document) so it can't inherit the
+     footer's white currentColor. Force the monochrome mark to white. */
+  filter: brightness(0) invert(1);
+}
+
+footer .footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 32px; /* 16px icon + 32px gap = 48px pitch */
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+}
+
+footer .footer-socials li {
   margin: 0;
 }
 
-@media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+footer .footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: #fff;
+  transition: opacity 0.2s ease;
+}
+
+footer .footer-social-link:hover {
+  opacity: 0.7;
+}
+
+footer .footer-social-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+
+  /* <img>-referenced SVGs can't inherit currentColor; force icons white. */
+  filter: brightness(0) invert(1);
+}
+
+/* ---- Link-list columns ---- */
+footer .footer-heading {
+  margin: 0 0 15px;
+  font-family: var(--heading-font-family); /* Syncopate */
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  line-height: 1.1;
+  color: #999;
+}
+
+footer .footer-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+footer .footer-links li {
+  margin: 0;
+}
+
+footer .footer-link {
+  display: block;
+  padding: 8px 0; /* ~38px row pitch with 14px line-height */
+  font-family: var(--body-font-family); /* Instrument Sans */
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #999;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+footer .footer-link:hover {
+  color: #fff;
+}
+
+/* ================= Mobile ================= */
+@media (width < 900px) {
+  footer .footer-inner {
+    padding: 48px 0;
+  }
+
+  footer .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+
+@media (width < 600px) {
+  footer .footer-grid {
+    grid-template-columns: 1fr;
   }
 }

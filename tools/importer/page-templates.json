@@ -6,43 +6,146 @@
     {
       "name": "homepage",
       "urls": [
-        "https://www.dianalefebvre.ca/"
+        "https://www.wknd-trendsetters.site/"
       ],
-      "representativeUrl": "https://www.dianalefebvre.ca/",
+      "representativeUrl": "https://www.wknd-trendsetters.site/",
       "coverageGaps": [],
-      "description": "Single-page therapist site homepage with a hero header (name, title), a tabbed content area (About, Practice, Fees, Contact sections with headings, paragraphs, and a list), and a footer.",
+      "description": "WKND Trendsetters fashion blog homepage with navbar, hero intro, featured story columns, image gallery cards, testimonials tabs, latest-articles cards, FAQ accordion, promo hero banner, and footer.",
       "blocks": [
         {
-          "name": "tabs-minimal",
+          "name": "hero-intro",
           "instances": [
-            "body > main"
+            "#main-content > header.section.secondary-section > div.container > div.grid-layout.tablet-1-column.grid-gap-xxl"
+          ]
+        },
+        {
+          "name": "columns-feature",
+          "instances": [
+            "#main-content > section.section:nth-of-type(1) > div.container > div.grid-layout.tablet-1-column.grid-gap-lg"
+          ]
+        },
+        {
+          "name": "cards-gallery",
+          "instances": [
+            "#main-content > section.section.secondary-section:nth-of-type(2) > div.container > div.grid-layout.desktop-4-column.tablet-2-column-1.mobile-portrait-1-column.grid-gap-sm"
+          ]
+        },
+        {
+          "name": "tabs-testimonial",
+          "instances": [
+            "#main-content > section.section:nth-of-type(3) > div.container > div.tabs-wrapper"
+          ]
+        },
+        {
+          "name": "cards-article",
+          "instances": [
+            "#main-content > section.section.secondary-section:nth-of-type(4) > div.container > div.grid-layout.desktop-4-column.tablet-2-column-1.mobile-portrait-1-column.grid-gap-md"
+          ]
+        },
+        {
+          "name": "accordion-faq",
+          "instances": [
+            "#main-content > section.section:nth-of-type(5) .faq-list"
+          ]
+        },
+        {
+          "name": "hero-banner",
+          "instances": [
+            "#main-content > section.section.inverse-section > div.container > div.grid-layout.desktop-1-column"
           ]
         }
       ],
       "sections": [
         {
-          "id": "section-1",
-          "name": "Hero",
+          "id": "rc2",
+          "name": "Hero intro",
           "selector": [
-            "body > header.header-wrapper"
+            "#main-content > header.section.secondary-section"
           ],
-          "style": null,
-          "blocks": [],
-          "defaultContent": [
-            "header .header.block h1",
-            "header .header.block h2",
-            "header .header-image img"
-          ]
+          "style": "secondary",
+          "blocks": [
+            "hero-intro"
+          ],
+          "defaultContent": []
         },
         {
-          "id": "section-2",
-          "name": "Tabbed content",
+          "id": "rc3",
+          "name": "Featured story",
           "selector": [
-            "body > main"
+            "#main-content > section.section:nth-of-type(1)"
           ],
           "style": null,
           "blocks": [
-            "tabs-minimal"
+            "columns-feature"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc4",
+          "name": "Image gallery",
+          "selector": [
+            "#main-content > section.section.secondary-section:nth-of-type(2)"
+          ],
+          "style": "secondary",
+          "blocks": [
+            "cards-gallery"
+          ],
+          "defaultContent": [
+            "#main-content > section.section.secondary-section:nth-of-type(2) > div.container > div.utility-text-align-center.utility-margin-bottom-8rem > h2.h2-heading",
+            "#main-content > section.section.secondary-section:nth-of-type(2) > div.container > div.utility-text-align-center.utility-margin-bottom-8rem > p.paragraph-lg"
+          ]
+        },
+        {
+          "id": "rc5",
+          "name": "Testimonials",
+          "selector": [
+            "#main-content > section.section:nth-of-type(3)"
+          ],
+          "style": null,
+          "blocks": [
+            "tabs-testimonial"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc6",
+          "name": "Latest articles",
+          "selector": [
+            "#main-content > section.section.secondary-section:nth-of-type(4)"
+          ],
+          "style": "secondary",
+          "blocks": [
+            "cards-article"
+          ],
+          "defaultContent": [
+            "#main-content > section.section.secondary-section:nth-of-type(4) > div.container > div.utility-text-align-center > h2.h2-heading",
+            "#main-content > section.section.secondary-section:nth-of-type(4) > div.container > div.utility-text-align-center > p.paragraph-lg"
+          ]
+        },
+        {
+          "id": "rc7",
+          "name": "FAQ",
+          "selector": [
+            "#main-content > section.section:nth-of-type(5)"
+          ],
+          "style": null,
+          "blocks": [
+            "accordion-faq"
+          ],
+          "defaultContent": [
+            "#main-content > section.section:nth-of-type(5) h2.h2-heading",
+            "#main-content > section.section:nth-of-type(5) p.subheading"
+          ]
+        },
+        {
+          "id": "rc8",
+          "name": "Promo banner",
+          "selector": [
+            "#main-content > section.section.inverse-section"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-banner"
           ],
           "defaultContent": []
         }

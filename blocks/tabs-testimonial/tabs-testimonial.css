@@ -1,0 +1,150 @@
+/* Block: tabs-testimonial -- values extracted from source computed styles */
+
+.tabs-testimonial {
+  display: block;
+}
+
+/* ---- Active panel: image + testimonial text ---- */
+.tabs-testimonial .tabs-testimonial-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.tabs-testimonial .tabs-testimonial-panel[aria-hidden='true'] {
+  display: none;
+}
+
+.tabs-testimonial .tabs-testimonial-image {
+  line-height: 0;
+}
+
+.tabs-testimonial .tabs-testimonial-image img,
+.tabs-testimonial .tabs-testimonial-image picture {
+  display: block;
+  width: 100%;
+}
+
+.tabs-testimonial .tabs-testimonial-image img {
+  aspect-ratio: 568 / 426;
+  object-fit: cover;
+}
+
+.tabs-testimonial .tabs-testimonial-name {
+  margin: 0;
+  font-family: var(--body-font-family);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 32px;
+  text-transform: none;
+  color: var(--color-black);
+}
+
+.tabs-testimonial .tabs-testimonial-role {
+  margin: 0 0 32px;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 32px;
+  color: var(--color-black);
+}
+
+.tabs-testimonial .tabs-testimonial-quote {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 32px;
+  color: var(--color-black);
+}
+
+/* ---- Tab menu: avatar buttons ---- */
+.tabs-testimonial .tabs-testimonial-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.tabs-testimonial .tabs-testimonial-list button.tabs-testimonial-tab {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  padding: 16px;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  background-color: #efefef;
+  color: var(--color-black);
+  font-family: var(--body-font-family);
+  font-weight: 400;
+  line-height: 1.6;
+  text-align: left;
+  text-transform: none;
+  white-space: normal;
+  overflow: visible;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.tabs-testimonial .tabs-testimonial-list button.tabs-testimonial-tab:hover {
+  border-color: var(--color-black);
+  background-color: #f5f5f5;
+}
+
+.tabs-testimonial .tabs-testimonial-list button.tabs-testimonial-tab[aria-selected='true'] {
+  border: 1px solid var(--color-black);
+  background-color: var(--light-color);
+  cursor: default;
+}
+
+.tabs-testimonial .tabs-testimonial-avatar {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.tabs-testimonial .tabs-testimonial-avatar img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+}
+
+.tabs-testimonial .tabs-testimonial-tab-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tabs-testimonial .tabs-testimonial-tab-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-black);
+}
+
+.tabs-testimonial .tabs-testimonial-tab-role {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-black);
+}
+
+/* ---- Desktop ---- */
+@media (width >= 900px) {
+  .tabs-testimonial .tabs-testimonial-panel {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .tabs-testimonial .tabs-testimonial-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

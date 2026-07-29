@@ -2,65 +2,143 @@
 /* global WebImporter */
 
 // PARSER IMPORTS
-import tabsMinimalParser from './parsers/tabs-minimal.js';
+import heroIntroParser from './parsers/hero-intro.js';
+import columnsFeatureParser from './parsers/columns-feature.js';
+import cardsGalleryParser from './parsers/cards-gallery.js';
+import tabsTestimonialParser from './parsers/tabs-testimonial.js';
+import cardsArticleParser from './parsers/cards-article.js';
+import accordionFaqParser from './parsers/accordion-faq.js';
+import heroBannerParser from './parsers/hero-banner.js';
 
 // TRANSFORMER IMPORTS
-import cleanupTransformer from './transformers/dianalefebvre-cleanup.js';
-import sectionsTransformer from './transformers/dianalefebvre-sections.js';
+import cleanupTransformer from './transformers/wknd-trendsetters-cleanup.js';
+import sectionsTransformer from './transformers/wknd-trendsetters-sections.js';
+
+// PARSER REGISTRY
+const parsers = {
+  'hero-intro': heroIntroParser,
+  'columns-feature': columnsFeatureParser,
+  'cards-gallery': cardsGalleryParser,
+  'tabs-testimonial': tabsTestimonialParser,
+  'cards-article': cardsArticleParser,
+  'accordion-faq': accordionFaqParser,
+  'hero-banner': heroBannerParser,
+};
 
 // PAGE TEMPLATE CONFIGURATION - Embedded from page-templates.json
 const PAGE_TEMPLATE = {
   name: 'homepage',
-  description: 'Single-page therapist site homepage with a hero header (name, title), a tabbed content area (About, Practice, Fees, Contact sections with headings, paragraphs, and a list), and a footer.',
+  description: 'WKND Trendsetters fashion blog homepage with navbar, hero intro, featured story columns, image gallery cards, testimonials tabs, latest-articles cards, FAQ accordion, promo hero banner, and footer.',
   urls: [
-    'https://www.dianalefebvre.ca/',
+    'https://www.wknd-trendsetters.site/',
   ],
   blocks: [
     {
-      name: 'tabs-minimal',
-      instances: ['body > main'],
+      name: 'hero-intro',
+      instances: ['#main-content > header.section.secondary-section > div.container > div.grid-layout.tablet-1-column.grid-gap-xxl'],
+    },
+    {
+      name: 'columns-feature',
+      instances: ['#main-content > section.section:nth-of-type(1) > div.container > div.grid-layout.tablet-1-column.grid-gap-lg'],
+    },
+    {
+      name: 'cards-gallery',
+      instances: ['#main-content > section.section.secondary-section:nth-of-type(2) > div.container > div.grid-layout.desktop-4-column.tablet-2-column-1.mobile-portrait-1-column.grid-gap-sm'],
+    },
+    {
+      name: 'tabs-testimonial',
+      instances: ['#main-content > section.section:nth-of-type(3) > div.container > div.tabs-wrapper'],
+    },
+    {
+      name: 'cards-article',
+      instances: ['#main-content > section.section.secondary-section:nth-of-type(4) > div.container > div.grid-layout.desktop-4-column.tablet-2-column-1.mobile-portrait-1-column.grid-gap-md'],
+    },
+    {
+      name: 'accordion-faq',
+      instances: ['#main-content > section.section:nth-of-type(5) .faq-list'],
+    },
+    {
+      name: 'hero-banner',
+      instances: ['#main-content > section.section.inverse-section > div.container > div.grid-layout.desktop-1-column'],
     },
   ],
   sections: [
     {
-      id: 'section-1',
-      name: 'Hero',
-      selector: ['body > header.header-wrapper'],
+      id: 'rc2',
+      name: 'Hero intro',
+      selector: ['#main-content > header.section.secondary-section'],
+      style: 'secondary',
+      blocks: ['hero-intro'],
+      defaultContent: [],
+    },
+    {
+      id: 'rc3',
+      name: 'Featured story',
+      selector: ['#main-content > section.section:nth-of-type(1)'],
       style: null,
-      blocks: [],
+      blocks: ['columns-feature'],
+      defaultContent: [],
+    },
+    {
+      id: 'rc4',
+      name: 'Image gallery',
+      selector: ['#main-content > section.section.secondary-section:nth-of-type(2)'],
+      style: 'secondary',
+      blocks: ['cards-gallery'],
       defaultContent: [
-        'header .header.block h1',
-        'header .header.block h2',
-        'header .header-image img',
+        '#main-content > section.section.secondary-section:nth-of-type(2) > div.container > div.utility-text-align-center.utility-margin-bottom-8rem > h2.h2-heading',
+        '#main-content > section.section.secondary-section:nth-of-type(2) > div.container > div.utility-text-align-center.utility-margin-bottom-8rem > p.paragraph-lg',
       ],
     },
     {
-      id: 'section-2',
-      name: 'Tabbed content',
-      selector: ['body > main'],
+      id: 'rc5',
+      name: 'Testimonials',
+      selector: ['#main-content > section.section:nth-of-type(3)'],
       style: null,
-      blocks: ['tabs-minimal'],
+      blocks: ['tabs-testimonial'],
+      defaultContent: [],
+    },
+    {
+      id: 'rc6',
+      name: 'Latest articles',
+      selector: ['#main-content > section.section.secondary-section:nth-of-type(4)'],
+      style: 'secondary',
+      blocks: ['cards-article'],
+      defaultContent: [
+        '#main-content > section.section.secondary-section:nth-of-type(4) > div.container > div.utility-text-align-center > h2.h2-heading',
+        '#main-content > section.section.secondary-section:nth-of-type(4) > div.container > div.utility-text-align-center > p.paragraph-lg',
+      ],
+    },
+    {
+      id: 'rc7',
+      name: 'FAQ',
+      selector: ['#main-content > section.section:nth-of-type(5)'],
+      style: null,
+      blocks: ['accordion-faq'],
+      defaultContent: [
+        '#main-content > section.section:nth-of-type(5) h2.h2-heading',
+        '#main-content > section.section:nth-of-type(5) p.subheading',
+      ],
+    },
+    {
+      id: 'rc8',
+      name: 'Promo banner',
+      selector: ['#main-content > section.section.inverse-section'],
+      style: null,
+      blocks: ['hero-banner'],
       defaultContent: [],
     },
   ],
 };
 
-// PARSER REGISTRY - Map parser names to functions
-const parsers = {
-  'tabs-minimal': tabsMinimalParser,
-};
-
-// TRANSFORMER REGISTRY - cleanup first, then sections (afterTransform)
+// TRANSFORMER REGISTRY - cleanup runs first, then section breaks/metadata
 const transformers = [
   cleanupTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
 ];
 
 /**
- * Execute all page transformers for a specific hook.
- * @param {string} hookName - 'beforeTransform' or 'afterTransform'
- * @param {Element} element - The DOM element to transform
- * @param {Object} payload - { document, url, html, params }
+ * Execute all page transformers for a specific hook
  */
 function executeTransformers(hookName, element, payload) {
   const enhancedPayload = {
@@ -78,10 +156,7 @@ function executeTransformers(hookName, element, payload) {
 }
 
 /**
- * Find all blocks on the page based on the embedded template configuration.
- * @param {Document} document - The DOM document
- * @param {Object} template - The embedded PAGE_TEMPLATE object
- * @returns {Array} Array of block instances found on the page
+ * Find all blocks on the page based on the embedded template configuration
  */
 function findBlocksOnPage(document, template) {
   const pageBlocks = [];
@@ -110,14 +185,14 @@ function findBlocksOnPage(document, template) {
 // EXPORT DEFAULT CONFIGURATION
 export default {
   transform: (payload) => {
-    const { document, url, params } = payload;
+    const { document, url, html, params } = payload;
 
     const main = document.body;
 
-    // 1. Execute beforeTransform transformers (initial cleanup)
+    // 1. beforeTransform (initial cleanup)
     executeTransformers('beforeTransform', main, payload);
 
-    // 2. Find blocks on page using embedded template
+    // 2. Find blocks on page
     const pageBlocks = findBlocksOnPage(document, PAGE_TEMPLATE);
 
     // 3. Parse each block using registered parsers
@@ -135,20 +210,17 @@ export default {
       }
     });
 
-    // 4. Execute afterTransform transformers (final cleanup + section breaks)
+    // 4. afterTransform (final cleanup + section breaks/metadata)
     executeTransformers('afterTransform', main, payload);
 
-    // 5. Apply WebImporter built-in rules
+    // 5. WebImporter built-in rules
     const hr = document.createElement('hr');
     main.appendChild(hr);
     WebImporter.rules.createMetadata(main, document);
     WebImporter.rules.transformBackgroundImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
-    // 6. Generate sanitized path.
-    // The site root ("/") reduces to an empty string; map it to "/index" (the
-    // standard EDS convention for the homepage) so the importer produces a
-    // valid document path.
+    // 6. Generate sanitized path (root "/" maps to /index)
     const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, '').replace(/\.html$/, '');
     const path = WebImporter.FileUtils.sanitizePath(rawPath || '/index');
 

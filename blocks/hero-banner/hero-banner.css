@@ -1,0 +1,118 @@
+/* Block: hero-banner — full-bleed PROMO/CTA banner.
+ * Values extracted from source computed styles (wknd-trendsetters promo card).
+ * Decorated DOM: .hero-banner.block > [image row] + [text row].
+ *   image row  = > div:first-child  (p > picture > img)
+ *   text row   = > div:last-child   (h2, p, p.button-container > a.button)
+ * Image is layered as a cover behind a dark bottom gradient; text sits bottom-left.
+ */
+
+.hero-banner {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 448px;
+  border-radius: 20px;
+  overflow: hidden;
+  color: var(--text-on-dark);
+}
+
+/* Image cell — cover the whole card */
+.hero-banner > div:first-child {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+.hero-banner > div:first-child > div,
+.hero-banner > div:first-child p,
+.hero-banner > div:first-child picture {
+  margin: 0;
+  height: 100%;
+}
+
+.hero-banner > div:first-child picture {
+  display: block;
+}
+
+.hero-banner picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  border-radius: 0;
+}
+
+/* Dark gradient overlay: darker at the bottom where the text sits */
+.hero-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: linear-gradient(to top, rgb(0 0 0 / 70%) 0%, rgb(0 0 0 / 0%) 60%);
+  pointer-events: none;
+}
+
+/* Text cell — overlaid content, bottom-left */
+/* stylelint-disable-next-line no-descending-specificity */
+.hero-banner > div:last-child {
+  position: relative;
+  z-index: 2;
+  max-width: 672px;
+  margin: 0;
+  padding: var(--space-xl);
+}
+
+.hero-banner > div:last-child > div {
+  margin: 0;
+}
+
+.hero-banner h2 {
+  margin: 0;
+  color: var(--text-on-dark);
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-xxl);   /* 56px */
+  font-weight: 700;
+  line-height: 61.6px;
+  letter-spacing: -1.12px;
+  text-transform: uppercase;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.hero-banner p {
+  margin: var(--space-md) 0 0;
+  color: var(--text-on-dark);
+  font-family: var(--body-font-family);
+  font-size: 18px;
+  line-height: 28.8px;
+}
+
+/* CTA — source "See more": white pill, black text, 2px white border */
+.hero-banner .button-container {
+  margin: var(--space-lg) 0 0;
+}
+
+.hero-banner a.button:any-link {
+  margin: 0;
+  padding: 12px 24px;
+  border: 2px solid var(--color-white);
+  border-radius: 9999px;
+  background-color: var(--color-white);
+  color: var(--color-black);
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-s);   /* 14px */
+  font-weight: 600;
+  text-transform: none;
+}
+
+.hero-banner a.button:any-link:hover,
+.hero-banner a.button:any-link:focus {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--color-black);
+}
+
+@media (width >= 900px) {
+  .hero-banner > div:last-child {
+    padding: var(--space-3xl);   /* 64px */
+  }
+}

@@ -1,0 +1,140 @@
+/* Block: accordion-faq — values extracted from source computed styles */
+
+/*
+ * FAQ section layout: source is a true 2-column split inside the 1200px content
+ * width — heading left (544px), accordion right (544px), 64px gutter, both sharing
+ * the same top. The section's default-content (heading/subheading) and the
+ * accordion-faq block are separate wrappers, so we grid the section wrapper itself.
+ */
+@media (width >= 900px) {
+  /* Grid the section itself; the two content wrappers become the two columns. */
+  main > .section.accordion-faq-container {
+    display: grid;
+    grid-template-columns: 544px 544px;
+    column-gap: 64px;
+    align-items: start;
+    justify-content: center;
+  }
+
+  /* Override the default per-wrapper max-width/auto-centering so each sits in
+     its own column: heading left, accordion right. */
+  main > .section.accordion-faq-container > .default-content-wrapper,
+  main > .section.accordion-faq-container > .accordion-faq-wrapper {
+    max-width: none;
+    width: auto;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Top-align the two columns: the heading's first child carries a top margin
+     (global h1-h6 rule) that the accordion's first item lacks, so without this
+     the heading column starts ~32px lower. Zero it to share the same top. */
+  main > .section.accordion-faq-container > .default-content-wrapper > :first-child {
+    margin-top: 0;
+  }
+}
+
+.accordion-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--color-black);
+}
+
+/* Item — bordered rounded card, transparent background */
+.accordion-faq .accordion-faq-item {
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+/* Question row (summary) */
+.accordion-faq .accordion-faq-item-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 32px;
+  margin: 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--body-font-family);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 28.8px;
+  text-transform: none;
+  color: var(--color-black);
+  transition: background-color 0.2s ease;
+}
+
+.accordion-faq .accordion-faq-item-label::-webkit-details-marker {
+  display: none;
+}
+
+.accordion-faq .accordion-faq-item-label-text {
+  font: inherit;
+  color: inherit;
+}
+
+/* Open question row + hover get light-grey background */
+/* stylelint-disable no-descending-specificity */
+.accordion-faq .accordion-faq-item[open] .accordion-faq-item-label,
+.accordion-faq .accordion-faq-item-label:hover {
+  background-color: var(--background-secondary);
+}
+/* stylelint-enable no-descending-specificity */
+
+/* Plus icon (two 2px bars) that rotates 45deg to an X when open */
+.accordion-faq .accordion-faq-item-icon {
+  position: relative;
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease;
+}
+
+.accordion-faq .accordion-faq-item-icon::before,
+.accordion-faq .accordion-faq-item-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: var(--color-black);
+}
+
+/* horizontal bar */
+.accordion-faq .accordion-faq-item-icon::before {
+  width: 14px;
+  height: 2px;
+  transform: translate(-50%, -50%);
+}
+
+/* vertical bar */
+.accordion-faq .accordion-faq-item-icon::after {
+  width: 2px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+}
+
+.accordion-faq .accordion-faq-item[open] .accordion-faq-item-icon {
+  transform: rotate(45deg);
+}
+
+/* Answer body */
+.accordion-faq .accordion-faq-item-body {
+  padding: 0 32px 32px;
+}
+
+.accordion-faq .accordion-faq-item:not([open]) .accordion-faq-item-body {
+  display: none;
+}
+
+.accordion-faq .accordion-faq-item-body p {
+  margin: 0;
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 27.2px;
+  color: var(--color-charcoal);
+}

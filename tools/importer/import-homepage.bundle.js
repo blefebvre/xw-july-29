@@ -41,169 +41,387 @@ var CustomImportScript = (() => {
     default: () => import_homepage_default
   });
 
-  // tools/importer/parsers/tabs-minimal.js
-  function parse(element, { document: document2 }) {
-    const buildHeading = (headingEl) => {
-      if (!headingEl) return null;
-      const tag = /^h[1-6]$/i.test(headingEl.tagName) ? headingEl.tagName.toLowerCase() : "h3";
-      const h = document2.createElement(tag);
-      h.textContent = (headingEl.textContent || "").trim();
-      return h.textContent ? h : null;
-    };
-    const collectRichtext = (panel) => {
-      const nodes = [];
-      if (!panel) return nodes;
-      panel.querySelectorAll("p, ul, ol").forEach((el) => {
-        if (el.closest(".columns-img-col")) return;
-        nodes.push(el);
-      });
-      panel.querySelectorAll(".columns > div > div:not(.columns-img-col)").forEach((cell) => {
-        if (cell.querySelector("p, ul, ol")) return;
-        const text = (cell.textContent || "").trim();
-        if (!text) return;
-        const p = document2.createElement("p");
-        p.innerHTML = cell.innerHTML;
-        nodes.push(p);
-      });
-      return nodes;
-    };
-    const nav = element.querySelector("nav.tab-nav, .tab-nav, nav");
-    const navLinks = nav ? Array.from(nav.querySelectorAll('a[href^="#"]')) : [];
-    const tabs = [];
-    navLinks.forEach((link) => {
-      const id = (link.getAttribute("href") || "").replace(/^#/, "").trim();
-      const heading = id ? element.querySelector(`[id="${id}"]`) : null;
-      const panel = heading ? heading.closest(".section") || heading.parentElement : null;
-      if (!panel) return;
-      tabs.push({ title: (link.textContent || "").trim(), heading, panel });
-    });
-    if (!tabs.length) {
-      element.querySelectorAll(":scope > div.section, div.section").forEach((panel) => {
-        const heading = panel.querySelector("h1, h2, h3, h4, h5, h6");
-        if (!heading) return;
-        tabs.push({ title: (heading.textContent || "").trim(), heading, panel });
-      });
-    }
-    const cells = [];
-    tabs.forEach(({ title, heading, panel }) => {
-      const titleCell = [];
-      titleCell.push(document2.createComment(" field:title "));
-      titleCell.push(document2.createTextNode(title));
-      const contentCell = [];
-      const headingClean = buildHeading(heading);
-      if (headingClean) {
-        contentCell.push(document2.createComment(" field:content_heading "));
-        contentCell.push(headingClean);
-      }
-      const imageEl = panel.querySelector(".columns-img-col picture, .columns-img-col img, picture, img");
-      if (imageEl) {
-        contentCell.push(document2.createComment(" field:content_image "));
-        contentCell.push(imageEl);
-      }
-      const richtext = collectRichtext(panel);
-      if (richtext.length) {
-        contentCell.push(document2.createComment(" field:content_richtext "));
-        richtext.forEach((n) => contentCell.push(n));
-      }
-      cells.push([titleCell, contentCell]);
-    });
-    if (!cells.length) {
+  // tools/importer/parsers/hero-intro.js
+  function parse(element, { document }) {
+    const heading = element.querySelector("h1, .h1-heading, h2");
+    const subheading = element.querySelector(".subheading, p");
+    const buttons = Array.from(element.querySelectorAll(".button-group a, a.button"));
+    const images = Array.from(element.querySelectorAll("img.cover-image, img"));
+    if (!heading && !subheading && images.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const block = WebImporter.Blocks.createBlock(document2, { name: "tabs-minimal", cells });
+    const makeCell = (fieldName, nodes) => {
+      const frag = document.createDocumentFragment();
+      if (fieldName) frag.appendChild(document.createComment(` field:${fieldName} `));
+      nodes.filter(Boolean).forEach((n) => frag.appendChild(n));
+      return frag;
+    };
+    const cells = [];
+    images.forEach((image, i) => {
+      const imageCell = makeCell("image", [image]);
+      const textCell = i === 0 ? makeCell("text", [heading, subheading, ...buttons]) : "";
+      cells.push([imageCell, textCell]);
+    });
+    if (images.length === 0) {
+      cells.push([makeCell("text", [heading, subheading, ...buttons])]);
+    }
+    const block = WebImporter.Blocks.createBlock(document, { name: "hero-intro", cells });
     element.replaceWith(block);
   }
 
-  // tools/importer/transformers/dianalefebvre-cleanup.js
-  var TransformHook = {
-    beforeTransform: "beforeTransform",
-    afterTransform: "afterTransform"
-  };
+  // tools/importer/parsers/columns-feature.js
+  function parse2(element, { document }) {
+    let columns = Array.from(element.querySelectorAll(":scope > div"));
+    if (columns.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const row = columns.map((col) => {
+      const cellNodes = Array.from(col.childNodes);
+      return cellNodes.length ? cellNodes : col;
+    });
+    const cells = [row];
+    const block = WebImporter.Blocks.createBlock(document, { name: "columns-feature", cells });
+    element.replaceWith(block);
+  }
+
+  // tools/importer/parsers/cards-gallery.js
+  function parse3(element, { document }) {
+    const cardEls = Array.from(element.querySelectorAll(":scope > div"));
+    if (cardEls.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const makeCell = (fieldName, nodes) => {
+      const frag = document.createDocumentFragment();
+      if (fieldName) frag.appendChild(document.createComment(` field:${fieldName} `));
+      nodes.filter(Boolean).forEach((n) => frag.appendChild(n));
+      return frag;
+    };
+    const cells = [];
+    cardEls.forEach((card) => {
+      const image = card.querySelector("img");
+      const imageCell = image ? makeCell("image", [image]) : "";
+      const textCell = "";
+      cells.push([imageCell, textCell]);
+    });
+    const block = WebImporter.Blocks.createBlock(document, { name: "cards-gallery", cells });
+    element.replaceWith(block);
+  }
+
+  // tools/importer/parsers/tabs-testimonial.js
+  function parse4(element, { document }) {
+    const panes = Array.from(element.querySelectorAll(".tabs-content > .tab-pane"));
+    const menuLinks = Array.from(element.querySelectorAll(".tab-menu .tab-menu-link"));
+    if (panes.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const cells = [];
+    panes.forEach((pane, i) => {
+      const menu = menuLinks[i];
+      const titleFrag = document.createDocumentFragment();
+      titleFrag.appendChild(document.createComment(" field:title "));
+      const menuName = menu && menu.querySelector(".paragraph-sm strong, strong");
+      const labelText = menuName ? menuName.textContent.trim() : pane.querySelector("strong") ? pane.querySelector("strong").textContent.trim() : `Tab ${i + 1}`;
+      titleFrag.appendChild(document.createTextNode(labelText));
+      const contentFrag = document.createDocumentFragment();
+      const image = pane.querySelector("img");
+      const nameEl = pane.querySelector(".paragraph-xl strong, strong");
+      const quote = pane.querySelector("p.paragraph-xl, p");
+      const infoBlock = nameEl ? nameEl.closest("div").parentElement : null;
+      let roleEl = null;
+      if (nameEl) {
+        const nameContainer = nameEl.closest("div");
+        roleEl = nameContainer && nameContainer.nextElementSibling;
+      }
+      if (nameEl) {
+        contentFrag.appendChild(document.createComment(" field:content_heading "));
+        const h3 = document.createElement("h3");
+        h3.textContent = nameEl.textContent.trim();
+        contentFrag.appendChild(h3);
+      }
+      if (image) {
+        contentFrag.appendChild(document.createComment(" field:content_image "));
+        contentFrag.appendChild(image);
+      }
+      contentFrag.appendChild(document.createComment(" field:content_richtext "));
+      if (roleEl) {
+        const roleP = document.createElement("p");
+        roleP.textContent = roleEl.textContent.trim();
+        contentFrag.appendChild(roleP);
+      }
+      if (quote) contentFrag.appendChild(quote);
+      cells.push([titleFrag, contentFrag]);
+    });
+    const block = WebImporter.Blocks.createBlock(document, { name: "tabs-testimonial", cells });
+    element.replaceWith(block);
+  }
+
+  // tools/importer/parsers/cards-article.js
+  function parse5(element, { document }) {
+    const cardEls = Array.from(element.querySelectorAll(":scope > a.article-card, :scope > a"));
+    if (cardEls.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const makeCell = (fieldName, nodes) => {
+      const frag = document.createDocumentFragment();
+      if (fieldName) frag.appendChild(document.createComment(` field:${fieldName} `));
+      nodes.filter(Boolean).forEach((n) => frag.appendChild(n));
+      return frag;
+    };
+    const cells = [];
+    cardEls.forEach((card) => {
+      const href = card.getAttribute("href");
+      const image = card.querySelector("img");
+      const imageCell = image ? makeCell("image", [image]) : "";
+      const textNodes = [];
+      const meta = card.querySelector(".article-card-meta");
+      if (meta) textNodes.push(meta);
+      const heading = card.querySelector("h3, .h4-heading, h2, h4");
+      if (heading && href) {
+        const link = document.createElement("a");
+        link.setAttribute("href", href);
+        link.textContent = heading.textContent.trim();
+        const h = document.createElement(heading.tagName.toLowerCase());
+        h.appendChild(link);
+        textNodes.push(h);
+      } else if (heading) {
+        textNodes.push(heading);
+      } else if (href) {
+        const link = document.createElement("a");
+        link.setAttribute("href", href);
+        link.textContent = href;
+        textNodes.push(link);
+      }
+      const textCell = textNodes.length ? makeCell("text", textNodes) : "";
+      cells.push([imageCell, textCell]);
+    });
+    const block = WebImporter.Blocks.createBlock(document, { name: "cards-article", cells });
+    element.replaceWith(block);
+  }
+
+  // tools/importer/parsers/accordion-faq.js
+  function parse6(element, { document }) {
+    const items = Array.from(element.querySelectorAll(":scope > details.faq-item, details.faq-item"));
+    if (items.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const cells = [];
+    items.forEach((item) => {
+      const summaryFrag = document.createDocumentFragment();
+      summaryFrag.appendChild(document.createComment(" field:summary "));
+      const questionText = item.querySelector(".faq-question span, summary span, summary");
+      summaryFrag.appendChild(document.createTextNode(questionText ? questionText.textContent.trim() : ""));
+      const textFrag = document.createDocumentFragment();
+      textFrag.appendChild(document.createComment(" field:text "));
+      const answer = item.querySelector(".faq-answer");
+      if (answer) {
+        Array.from(answer.childNodes).forEach((n) => textFrag.appendChild(n));
+      }
+      cells.push([summaryFrag, textFrag]);
+    });
+    const block = WebImporter.Blocks.createBlock(document, { name: "accordion-faq", cells });
+    element.replaceWith(block);
+  }
+
+  // tools/importer/parsers/hero-banner.js
+  function parse7(element, { document }) {
+    const image = element.querySelector("img.cover-image, img");
+    const heading = element.querySelector("h1, h2, .h1-heading");
+    const subheading = element.querySelector(".subheading, p");
+    const buttons = Array.from(element.querySelectorAll(".button-group a, a.button"));
+    if (!heading && !subheading && !image) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const makeCell = (fieldName, nodes) => {
+      const frag = document.createDocumentFragment();
+      if (fieldName) frag.appendChild(document.createComment(` field:${fieldName} `));
+      nodes.filter(Boolean).forEach((n) => frag.appendChild(n));
+      return frag;
+    };
+    const cells = [];
+    if (image) cells.push([makeCell("image", [image])]);
+    cells.push([makeCell("text", [heading, subheading, ...buttons])]);
+    const block = WebImporter.Blocks.createBlock(document, { name: "hero-banner", cells });
+    element.replaceWith(block);
+  }
+
+  // tools/importer/transformers/wknd-trendsetters-cleanup.js
+  var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.afterTransform) {
       WebImporter.DOMUtils.remove(element, [
-        "footer",
-        "#franklin-svg-sprite"
+        ".skip-link",
+        ".navbar",
+        "footer"
       ]);
+      element.querySelectorAll("*").forEach((el) => {
+        [...el.attributes].forEach((attr) => {
+          if (attr.name.startsWith("data-astro-cid-")) {
+            el.removeAttribute(attr.name);
+          }
+        });
+      });
     }
   }
 
-  // tools/importer/transformers/dianalefebvre-sections.js
-  var TransformHook2 = {
-    beforeTransform: "beforeTransform",
-    afterTransform: "afterTransform"
-  };
+  // tools/importer/transformers/wknd-trendsetters-sections.js
+  var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  function findSectionElement(root, selectors) {
+    const list = Array.isArray(selectors) ? selectors : [selectors];
+    for (let i = 0; i < list.length; i += 1) {
+      const sel = list[i];
+      if (!sel) continue;
+      let el = root.querySelector(sel);
+      if (!el && root.ownerDocument) {
+        el = root.ownerDocument.querySelector(sel);
+      }
+      if (el) return el;
+    }
+    return null;
+  }
   function transform2(hookName, element, payload) {
-    if (hookName !== TransformHook2.afterTransform) return;
-    const sections = payload && payload.template && payload.template.sections;
-    if (!Array.isArray(sections) || sections.length < 2) return;
-    const doc = payload && payload.document || element.ownerDocument || document;
-    const findSectionElement = (section) => {
-      const selectors = Array.isArray(section.selector) ? section.selector : [section.selector].filter(Boolean);
-      for (const selector of selectors) {
-        const el = element.querySelector(selector) || doc.querySelector(selector);
-        if (el) return el;
-      }
-      return null;
-    };
-    for (let i = sections.length - 1; i >= 0; i -= 1) {
-      const section = sections[i];
-      const sectionEl = findSectionElement(section);
-      if (!sectionEl) continue;
-      if (section.style) {
-        const style = Array.isArray(section.style) ? section.style.join(", ") : section.style;
-        const block = WebImporter.Blocks.createBlock(doc, {
-          name: "Section Metadata",
-          cells: { style }
-        });
-        sectionEl.before(block);
-      }
-      if (i > 0 && sectionEl.previousElementSibling) {
-        const hr = doc.createElement("hr");
-        sectionEl.before(hr);
+    if (hookName === TransformHook2.afterTransform) {
+      const sections = payload && payload.template && payload.template.sections;
+      if (!Array.isArray(sections) || sections.length < 2) return;
+      const document = element.ownerDocument;
+      for (let i = sections.length - 1; i >= 0; i -= 1) {
+        const section = sections[i];
+        const el = findSectionElement(element, section.selector);
+        if (!el) continue;
+        if (section.style) {
+          const block = WebImporter.Blocks.createBlock(document, {
+            name: "Section Metadata",
+            cells: { style: section.style }
+          });
+          el.append(block);
+        }
+        if (i > 0) {
+          const hr = document.createElement("hr");
+          el.before(hr);
+        }
       }
     }
   }
 
   // tools/importer/import-homepage.js
+  var parsers = {
+    "hero-intro": parse,
+    "columns-feature": parse2,
+    "cards-gallery": parse3,
+    "tabs-testimonial": parse4,
+    "cards-article": parse5,
+    "accordion-faq": parse6,
+    "hero-banner": parse7
+  };
   var PAGE_TEMPLATE = {
     name: "homepage",
-    description: "Single-page therapist site homepage with a hero header (name, title), a tabbed content area (About, Practice, Fees, Contact sections with headings, paragraphs, and a list), and a footer.",
+    description: "WKND Trendsetters fashion blog homepage with navbar, hero intro, featured story columns, image gallery cards, testimonials tabs, latest-articles cards, FAQ accordion, promo hero banner, and footer.",
     urls: [
-      "https://www.dianalefebvre.ca/"
+      "https://www.wknd-trendsetters.site/"
     ],
     blocks: [
       {
-        name: "tabs-minimal",
-        instances: ["body > main"]
+        name: "hero-intro",
+        instances: ["#main-content > header.section.secondary-section > div.container > div.grid-layout.tablet-1-column.grid-gap-xxl"]
+      },
+      {
+        name: "columns-feature",
+        instances: ["#main-content > section.section:nth-of-type(1) > div.container > div.grid-layout.tablet-1-column.grid-gap-lg"]
+      },
+      {
+        name: "cards-gallery",
+        instances: ["#main-content > section.section.secondary-section:nth-of-type(2) > div.container > div.grid-layout.desktop-4-column.tablet-2-column-1.mobile-portrait-1-column.grid-gap-sm"]
+      },
+      {
+        name: "tabs-testimonial",
+        instances: ["#main-content > section.section:nth-of-type(3) > div.container > div.tabs-wrapper"]
+      },
+      {
+        name: "cards-article",
+        instances: ["#main-content > section.section.secondary-section:nth-of-type(4) > div.container > div.grid-layout.desktop-4-column.tablet-2-column-1.mobile-portrait-1-column.grid-gap-md"]
+      },
+      {
+        name: "accordion-faq",
+        instances: ["#main-content > section.section:nth-of-type(5) .faq-list"]
+      },
+      {
+        name: "hero-banner",
+        instances: ["#main-content > section.section.inverse-section > div.container > div.grid-layout.desktop-1-column"]
       }
     ],
     sections: [
       {
-        id: "section-1",
-        name: "Hero",
-        selector: ["body > header.header-wrapper"],
+        id: "rc2",
+        name: "Hero intro",
+        selector: ["#main-content > header.section.secondary-section"],
+        style: "secondary",
+        blocks: ["hero-intro"],
+        defaultContent: []
+      },
+      {
+        id: "rc3",
+        name: "Featured story",
+        selector: ["#main-content > section.section:nth-of-type(1)"],
         style: null,
-        blocks: [],
+        blocks: ["columns-feature"],
+        defaultContent: []
+      },
+      {
+        id: "rc4",
+        name: "Image gallery",
+        selector: ["#main-content > section.section.secondary-section:nth-of-type(2)"],
+        style: "secondary",
+        blocks: ["cards-gallery"],
         defaultContent: [
-          "header .header.block h1",
-          "header .header.block h2",
-          "header .header-image img"
+          "#main-content > section.section.secondary-section:nth-of-type(2) > div.container > div.utility-text-align-center.utility-margin-bottom-8rem > h2.h2-heading",
+          "#main-content > section.section.secondary-section:nth-of-type(2) > div.container > div.utility-text-align-center.utility-margin-bottom-8rem > p.paragraph-lg"
         ]
       },
       {
-        id: "section-2",
-        name: "Tabbed content",
-        selector: ["body > main"],
+        id: "rc5",
+        name: "Testimonials",
+        selector: ["#main-content > section.section:nth-of-type(3)"],
         style: null,
-        blocks: ["tabs-minimal"],
+        blocks: ["tabs-testimonial"],
+        defaultContent: []
+      },
+      {
+        id: "rc6",
+        name: "Latest articles",
+        selector: ["#main-content > section.section.secondary-section:nth-of-type(4)"],
+        style: "secondary",
+        blocks: ["cards-article"],
+        defaultContent: [
+          "#main-content > section.section.secondary-section:nth-of-type(4) > div.container > div.utility-text-align-center > h2.h2-heading",
+          "#main-content > section.section.secondary-section:nth-of-type(4) > div.container > div.utility-text-align-center > p.paragraph-lg"
+        ]
+      },
+      {
+        id: "rc7",
+        name: "FAQ",
+        selector: ["#main-content > section.section:nth-of-type(5)"],
+        style: null,
+        blocks: ["accordion-faq"],
+        defaultContent: [
+          "#main-content > section.section:nth-of-type(5) h2.h2-heading",
+          "#main-content > section.section:nth-of-type(5) p.subheading"
+        ]
+      },
+      {
+        id: "rc8",
+        name: "Promo banner",
+        selector: ["#main-content > section.section.inverse-section"],
+        style: null,
+        blocks: ["hero-banner"],
         defaultContent: []
       }
     ]
-  };
-  var parsers = {
-    "tabs-minimal": parse
   };
   var transformers = [
     transform,
@@ -221,11 +439,11 @@ var CustomImportScript = (() => {
       }
     });
   }
-  function findBlocksOnPage(document2, template) {
+  function findBlocksOnPage(document, template) {
     const pageBlocks = [];
     template.blocks.forEach((blockDef) => {
       blockDef.instances.forEach((selector) => {
-        const elements = document2.querySelectorAll(selector);
+        const elements = document.querySelectorAll(selector);
         if (elements.length === 0) {
           console.warn(`Block "${blockDef.name}" selector not found: ${selector}`);
         }
@@ -244,16 +462,16 @@ var CustomImportScript = (() => {
   }
   var import_homepage_default = {
     transform: (payload) => {
-      const { document: document2, url, params } = payload;
-      const main = document2.body;
+      const { document, url, html, params } = payload;
+      const main = document.body;
       executeTransformers("beforeTransform", main, payload);
-      const pageBlocks = findBlocksOnPage(document2, PAGE_TEMPLATE);
+      const pageBlocks = findBlocksOnPage(document, PAGE_TEMPLATE);
       pageBlocks.forEach((block) => {
         if (!block.element.parentNode) return;
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document: document2, url, params });
+            parser(block.element, { document, url, params });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }
@@ -262,10 +480,10 @@ var CustomImportScript = (() => {
         }
       });
       executeTransformers("afterTransform", main, payload);
-      const hr = document2.createElement("hr");
+      const hr = document.createElement("hr");
       main.appendChild(hr);
-      WebImporter.rules.createMetadata(main, document2);
-      WebImporter.rules.transformBackgroundImages(main, document2);
+      WebImporter.rules.createMetadata(main, document);
+      WebImporter.rules.transformBackgroundImages(main, document);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html$/, "");
       const path = WebImporter.FileUtils.sanitizePath(rawPath || "/index");
@@ -273,7 +491,7 @@ var CustomImportScript = (() => {
         element: main,
         path,
         report: {
-          title: document2.title,
+          title: document.title,
           template: PAGE_TEMPLATE.name,
           blocks: pageBlocks.map((b) => b.name)
         }

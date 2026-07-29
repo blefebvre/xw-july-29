@@ -1,0 +1,80 @@
+/* columns-feature — "featured story" on white bg.
+   Values extracted from source computed styles at 1440px. */
+
+/* Row: mobile-first single column, image stacks above text */
+.columns-feature > div {
+  display: grid;
+  gap: var(--space-lg); /* 24px */
+}
+
+/* Image cell — 3:2 rounded cover */
+.columns-feature .columns-feature-img-col img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+/* Text cell (the non-image column) */
+.columns-feature > div > div:not(.columns-feature-img-col) {
+  padding: 0;
+}
+
+/* Breadcrumbs: Home › Case studies */
+.columns-feature > div > div:not(.columns-feature-img-col) > p:first-child {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs); /* 8px */
+  margin: 0 0 var(--space-xl); /* 0 0 32px */
+  font-size: var(--body-font-size-m); /* 16px */
+  line-height: 1.25;
+}
+
+.columns-feature > div > div:not(.columns-feature-img-col) > p:first-child a:any-link {
+  font-size: var(--body-font-size-m); /* 16px */
+  font-weight: 500;
+  color: var(--color-black);
+  text-decoration: none;
+}
+
+.columns-feature > div > div:not(.columns-feature-img-col) > p:first-child a + a::before {
+  content: "\203A"; /* › */
+  margin-right: var(--space-xs); /* 8px */
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* Heading */
+.columns-feature > div > div:not(.columns-feature-img-col) h2 {
+  margin: 0;
+  font-size: var(--heading-size-xl); /* 40px */
+  line-height: 44px;
+  letter-spacing: normal;
+}
+
+/* Byline (By Taylor Brooks) */
+/* stylelint-disable-next-line no-descending-specificity */
+.columns-feature > div > div:not(.columns-feature-img-col) h2 + p {
+  margin: var(--space-md) 0 0; /* 16px */
+  font-size: var(--body-font-size-s); /* 14px */
+  line-height: 1.4;
+  color: var(--color-black);
+}
+
+/* Date / read-time meta — muted grey */
+.columns-feature > div > div:not(.columns-feature-img-col) > p:last-child {
+  margin: var(--space-xxs) 0 0; /* 4px */
+  font-size: var(--body-font-size-s); /* 14px */
+  line-height: 1.4;
+  color: var(--text-secondary); /* #666 */
+}
+
+/* Desktop: two equal columns, vertically centered */
+@media (width >= 900px) {
+  .columns-feature > div {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    column-gap: var(--space-lg); /* 24px */
+  }
+}

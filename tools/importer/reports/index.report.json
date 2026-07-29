@@ -1,11 +1,17 @@
 {
   "status": "success",
-  "url": "https://www.dianalefebvre.ca/",
+  "url": "https://www.wknd-trendsetters.site/",
   "path": "index",
-  "timestamp": "2026-07-29T14:44:40.424Z",
-  "title": "About",
+  "timestamp": "2026-07-29T18:00:38.833Z",
+  "title": "WKND Trendsetters - Fresh Looks, Bold Stories, Real Life",
   "template": "homepage",
   "blocks": [
-    "tabs-minimal"
+    "hero-intro",
+    "columns-feature",
+    "cards-gallery",
+    "tabs-testimonial",
+    "cards-article",
+    "accordion-faq",
+    "hero-banner"
   ]
 }
