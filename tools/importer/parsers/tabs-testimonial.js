@@ -34,7 +34,10 @@ export default function parse(element, { document }) {
 
     // --- Content cell: grouped content_* fields. ---
     const contentFrag = document.createDocumentFragment();
-    const image = pane.querySelector('img');
+    // Each person has a dedicated avatar in their tab-menu button
+    // (avatar-*.avif). Prefer that over the large panel image, which is an
+    // unrelated hero/gallery shot. Fall back to the panel image if no avatar.
+    const image = (menu && menu.querySelector('img')) || pane.querySelector('img');
     const nameEl = pane.querySelector('.paragraph-xl strong, strong');
     const quote = pane.querySelector('p.paragraph-xl, p');
     // role: the div following the name block

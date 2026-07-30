@@ -35,47 +35,87 @@ function openDropdown(trigger) {
 }
 
 /**
- * Build the Trends flyout panel from the nested <ul> the author provided.
- * Each <li> = a link (title) + trailing text node (description). The final
- * entry ("Fresh fits, bold moves") becomes the featured card.
+ * Direct trailing text of an <li> (the description after its <a> title).
+ */
+function directDescription(li, link) {
+  return Array.from(li.childNodes)
+    .filter((n) => n.nodeType === Node.TEXT_NODE)
+    .map((n) => n.textContent)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim() || (link ? li.textContent.replace(link.textContent, '').trim() : '');
+}
+
+/** Build a titled entry (title + optional description) for a dropdown. */
+function buildEntry(li) {
+  const link = li.querySelector(':scope > a');
+  if (!link) return null;
+  const entry = document.createElement('a');
+  entry.className = 'nav-dropdown-entry';
+  entry.href = link.getAttribute('href');
+  const title = document.createElement('span');
+  title.className = 'nav-dropdown-entry-title';
+  title.textContent = link.textContent.trim();
+  entry.append(title);
+  const desc = directDescription(li, link);
+  if (desc) {
+    const d = document.createElement('span');
+    d.className = 'nav-dropdown-entry-desc';
+    d.textContent = desc;
+    entry.append(d);
+  }
+  return entry;
+}
+
+/**
+ * Build a flyout panel from the nested <ul> the author provided.
+ * Two shapes are supported, chosen from the content itself:
+ *  - Mega-menu (Trends): children are category groups (<li>Label<ul>…</ul></li>),
+ *    optionally followed by a loose link <li> that becomes the featured card.
+ *  - Simple dropdown (Support): children are plain link <li>s (no nested <ul>),
+ *    rendered as a single-column list.
  */
 function buildDropdownPanel(sourceList) {
   const panel = document.createElement('div');
   panel.className = 'nav-dropdown-panel';
   panel.hidden = true;
 
-  const grid = document.createElement('div');
-  grid.className = 'nav-dropdown-grid';
+  const children = [...sourceList.children];
+  const categoryGroups = children.filter((li) => li.querySelector(':scope > ul'));
+  const looseItems = children.filter((li) => !li.querySelector(':scope > ul') && li.querySelector(':scope > a'));
 
-  const items = [...sourceList.children];
-  const featured = items.pop(); // last entry is the featured card
+  if (categoryGroups.length > 0) {
+    // --- Mega-menu: category columns + optional featured card ---
+    panel.classList.add('nav-dropdown-mega');
+    const grid = document.createElement('div');
+    grid.className = 'nav-dropdown-grid';
 
-  items.forEach((li) => {
-    const link = li.querySelector('a');
-    if (!link) return;
-    const desc = li.textContent.replace(link.textContent, '').trim();
-    const entry = document.createElement('a');
-    entry.className = 'nav-dropdown-entry';
-    entry.href = link.getAttribute('href');
-    const title = document.createElement('span');
-    title.className = 'nav-dropdown-entry-title';
-    title.textContent = link.textContent.trim();
-    entry.append(title);
-    if (desc) {
-      const d = document.createElement('span');
-      d.className = 'nav-dropdown-entry-desc';
-      d.textContent = desc;
-      entry.append(d);
-    }
-    grid.append(entry);
-  });
+    categoryGroups.forEach((group) => {
+      const col = document.createElement('div');
+      col.className = 'nav-dropdown-category';
+      const headingText = group.childNodes[0] ? group.childNodes[0].textContent.trim() : '';
+      if (headingText) {
+        const h = document.createElement('h3');
+        h.className = 'nav-dropdown-category-title';
+        h.textContent = headingText;
+        col.append(h);
+      }
+      const links = document.createElement('div');
+      links.className = 'nav-dropdown-category-links';
+      group.querySelectorAll(':scope > ul > li').forEach((li) => {
+        const entry = buildEntry(li);
+        if (entry) links.append(entry);
+      });
+      col.append(links);
+      grid.append(col);
+    });
 
-  panel.append(grid);
+    panel.append(grid);
 
-  // Featured card (black promo tile)
-  if (featured) {
-    const link = featured.querySelector('a');
-    if (link) {
+    // Featured card (black promo tile) from a loose link item.
+    const featured = looseItems[0];
+    if (featured) {
+      const link = featured.querySelector(':scope > a');
       const card = document.createElement('a');
       card.className = 'nav-dropdown-featured';
       card.href = link.getAttribute('href');
@@ -83,7 +123,7 @@ function buildDropdownPanel(sourceList) {
       title.className = 'nav-dropdown-featured-title';
       title.textContent = link.textContent.trim();
       card.append(title);
-      const desc = featured.textContent.replace(link.textContent, '').trim();
+      const desc = directDescription(featured, link);
       if (desc) {
         const d = document.createElement('span');
         d.className = 'nav-dropdown-featured-desc';
@@ -92,6 +132,20 @@ function buildDropdownPanel(sourceList) {
       }
       panel.append(card);
     }
+  } else {
+    // --- Simple dropdown (Support): single-column list of links ---
+    panel.classList.add('nav-dropdown-simple');
+    const list = document.createElement('div');
+    list.className = 'nav-dropdown-list';
+    looseItems.forEach((li) => {
+      const link = li.querySelector(':scope > a');
+      const a = document.createElement('a');
+      a.className = 'nav-dropdown-simple-link';
+      a.href = link.getAttribute('href');
+      a.textContent = link.textContent.trim();
+      list.append(a);
+    });
+    panel.append(list);
   }
 
   return panel;

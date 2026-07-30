@@ -127,7 +127,7 @@ var CustomImportScript = (() => {
       const labelText = menuName ? menuName.textContent.trim() : pane.querySelector("strong") ? pane.querySelector("strong").textContent.trim() : `Tab ${i + 1}`;
       titleFrag.appendChild(document.createTextNode(labelText));
       const contentFrag = document.createDocumentFragment();
-      const image = pane.querySelector("img");
+      const image = menu && menu.querySelector("img") || pane.querySelector("img");
       const nameEl = pane.querySelector(".paragraph-xl strong, strong");
       const quote = pane.querySelector("p.paragraph-xl, p");
       const infoBlock = nameEl ? nameEl.closest("div").parentElement : null;

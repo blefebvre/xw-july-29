@@ -98,32 +98,53 @@ header .nav-drop-trigger[aria-expanded='true'] {
   background-color: #f5f5f5;
 }
 
-/* ---- Trends dropdown flyout ---- */
+/* ---- Dropdown flyout (shared) ---- */
 header .nav-dropdown-panel {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
   z-index: 20;
-  width: 640px;
-  max-width: calc(100vw - 48px);
   background: #fff;
   border: 1px solid #e8e8e8;
   border-radius: 16px;
   box-shadow: 0 12px 32px rgb(0 0 0 / 12%);
   padding: 20px;
-  display: flex;
-  gap: 20px;
 }
 
 header .nav-dropdown-panel[hidden] {
   display: none;
 }
 
+/* Trends mega-menu: 3 category columns + featured card */
+header .nav-dropdown-mega {
+  display: flex;
+  gap: 24px;
+  width: 760px;
+  max-width: calc(100vw - 48px);
+}
+
 header .nav-dropdown-grid {
   flex: 1 1 auto;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 12px;
+}
+
+header .nav-dropdown-category-title {
+  margin: 0 0 8px;
+  padding: 0 12px;
+  font-family: var(--heading-font-family); /* Syncopate */
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #999;
+}
+
+header .nav-dropdown-category-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 header .nav-dropdown-entry {
@@ -152,6 +173,34 @@ header .nav-dropdown-entry-desc {
   font-size: 13px;
   font-weight: 400;
   color: #666;
+}
+
+/* Simple dropdown (Support): single-column link list */
+header .nav-dropdown-simple {
+  width: 200px;
+  max-width: calc(100vw - 48px);
+}
+
+header .nav-dropdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+header .nav-dropdown-simple-link {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+header .nav-dropdown-simple-link:hover {
+  background-color: #f5f5f5;
 }
 
 /* Featured card (black promo tile) */

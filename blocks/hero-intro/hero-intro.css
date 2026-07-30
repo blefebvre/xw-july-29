@@ -21,8 +21,8 @@
 
 .hero-intro .hero-intro-text h1 {
   margin: 0;
-  font-size: var(--heading-size-xxl); /* 56px */
-  line-height: 61.6px;
+  font-size: 28px; /* mobile: matches source */
+  line-height: 30.8px;
   letter-spacing: -1.12px;
   text-transform: uppercase;
   color: var(--color-black);
@@ -36,9 +36,11 @@
 }
 
 /* ---- CTA actions row ---- */
+
+/* Mobile: full-width stacked pills (matches source 328px / 50px). */
 .hero-intro .hero-intro-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 16px;
   margin-top: 32px;
 }
@@ -48,6 +50,10 @@
 }
 
 .hero-intro .hero-intro-actions a.button:any-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   margin: 0;
   padding: 12px 24px;
   border: 2px solid var(--color-black);
@@ -64,9 +70,11 @@
 }
 
 /* ---- Image cluster ---- */
+
+/* Mobile: single full-width column (matches source ~327px, stacked). */
 .hero-intro .hero-intro-images {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 8px;
 }
 
@@ -85,8 +93,31 @@
 }
 
 @media (width >= 900px) {
+  /* Match source exactly: two fixed 544px columns + 64px gap = 1152px content,
+     centered. Fixed widths (not 1fr) keep the text column at 544px regardless
+     of the surrounding container width, so the H1 wraps identically to source. */
   .hero-intro {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 544px 544px;
     gap: 64px;
+    justify-content: center;
+  }
+
+  /* Desktop H1 (56px), 2-column image collage, inline auto-width CTAs. */
+  .hero-intro .hero-intro-text h1 {
+    font-size: var(--heading-size-xxl); /* 56px */
+    line-height: 61.6px;
+  }
+
+  .hero-intro .hero-intro-images {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero-intro .hero-intro-actions {
+    flex-flow: row wrap;
+  }
+
+  .hero-intro .hero-intro-actions a.button:any-link {
+    display: inline-block;
+    width: auto;
   }
 }

@@ -1,5 +1,13 @@
 @import url('brand.css');
 
+/* Global border-box reset — padding/border stay inside declared widths,
+   preventing horizontal overflow (e.g. padded cards on mobile). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 /*
  * Copyright 2020 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -123,6 +131,21 @@ h3 {
 h4 { font-size: var(--heading-font-size-m); }
 h5 { font-size: var(--heading-font-size-s); }
 h6 { font-size: var(--heading-font-size-xs); }
+
+/* Mobile type scale — matches source at 375px (H1 28px, section H2 24px).
+   Block-level overrides (hero-intro h1, hero-banner h2) mirror these in their
+   own CSS so their higher specificity doesn't keep the desktop sizes. */
+@media (width < 900px) {
+  h1 {
+    font-size: 28px;
+    line-height: 30.8px;
+  }
+
+  h2 {
+    font-size: 24px;
+    line-height: 26.4px;
+  }
+}
 
 p,
 dl,
@@ -270,7 +293,7 @@ main > .section {
 main > .section > div {
   max-width: var(--content-max-width);
   margin: auto;
-  padding: 0 24px;
+  padding: 0 16px; /* mobile gutter matches source (16px) */
 }
 
 main > .section:first-of-type {
