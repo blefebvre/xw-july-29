@@ -8,9 +8,21 @@
  * DA/EDS production serves {footerPath}.plain.html.
  */
 async function fetchFooter(footerPath) {
-  let resp = await fetch('/content/footer.plain.html');
-  if (!resp.ok) resp = await fetch(`${footerPath}.plain.html`);
-  if (!resp.ok) return null;
+  // On aem.page/aem.live the footer doc lives at the site root (/footer.plain.html).
+  // Local `aem up` serves the repo's content/ folder at /content, so the doc is
+  // at /content/footer.plain.html there. Pick the right order per environment so
+  // neither one fires a wasted 404; keep the other as a fallback for safety.
+  const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const candidates = isLocal
+    ? [`/content${footerPath}.plain.html`, `${footerPath}.plain.html`]
+    : [`${footerPath}.plain.html`, `/content${footerPath}.plain.html`];
+  let resp;
+  for (let i = 0; i < candidates.length; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    resp = await fetch(candidates[i]);
+    if (resp.ok) break;
+  }
+  if (!resp || !resp.ok) return null;
   const html = await resp.text();
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
@@ -18,7 +30,7 @@ async function fetchFooter(footerPath) {
 }
 
 export default async function decorate(block) {
-  const footerPath = '/content/footer';
+  const footerPath = '/footer';
   const fragment = await fetchFooter(footerPath);
   block.textContent = '';
   if (!fragment) return;

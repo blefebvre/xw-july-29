@@ -11,9 +11,21 @@ const isDesktop = window.matchMedia('(min-width: 900px)');
  * DA/EDS production serves {navPath}.plain.html.
  */
 async function fetchNav(navPath) {
-  let resp = await fetch('/content/nav.plain.html');
-  if (!resp.ok) resp = await fetch(`${navPath}.plain.html`);
-  if (!resp.ok) return null;
+  // On aem.page/aem.live the nav doc lives at the site root (/nav.plain.html).
+  // Local `aem up` serves the repo's content/ folder at /content, so the doc is
+  // at /content/nav.plain.html there. Pick the right order per environment so
+  // neither one fires a wasted 404; keep the other as a fallback for safety.
+  const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const candidates = isLocal
+    ? [`/content${navPath}.plain.html`, `${navPath}.plain.html`]
+    : [`${navPath}.plain.html`, `/content${navPath}.plain.html`];
+  let resp;
+  for (let i = 0; i < candidates.length; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    resp = await fetch(candidates[i]);
+    if (resp.ok) break;
+  }
+  if (!resp || !resp.ok) return null;
   const html = await resp.text();
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
@@ -195,7 +207,7 @@ function buildSections(listRoot) {
 }
 
 export default async function decorate(block) {
-  const navPath = '/content/nav';
+  const navPath = '/nav';
   const fragment = await fetchNav(navPath);
   block.textContent = '';
   if (!fragment) return;
