@@ -47,20 +47,49 @@ function openDropdown(trigger) {
 }
 
 /**
- * Direct trailing text of an <li> (the description after its <a> title).
+ * Trailing description text of an <li> — the text after its <a> title.
+ * The title link and description may sit directly in the <li> or inside a <p>
+ * wrapper (published markup), so read text nodes from whichever holds the link.
  */
 function directDescription(li, link) {
-  return Array.from(li.childNodes)
+  const host = (link && link.parentElement && link.parentElement.tagName === 'P')
+    ? link.parentElement
+    : li;
+  const trailing = Array.from(host.childNodes)
     .filter((n) => n.nodeType === Node.TEXT_NODE)
     .map((n) => n.textContent)
     .join(' ')
     .replace(/\s+/g, ' ')
-    .trim() || (link ? li.textContent.replace(link.textContent, '').trim() : '');
+    .trim();
+  if (trailing) return trailing;
+  // Fallback: strip the title text from the host's full text.
+  return link ? host.textContent.replace(link.textContent, '').replace(/\s+/g, ' ').trim() : '';
+}
+
+/**
+ * The own label text of an <li> — the text before any nested <ul>, tolerating
+ * a <p> wrapper (the content pipeline wraps labels in <p> when published) and
+ * pretty-print whitespace/newlines. Ignores nested submenu text.
+ */
+function ownLabel(li) {
+  // Prefer an explicit <p> wrapper's text; else the li's own direct text nodes.
+  const p = li.querySelector(':scope > p');
+  if (p) return p.textContent.replace(/\s+/g, ' ').trim();
+  const direct = Array.from(li.childNodes)
+    .filter((n) => n.nodeType === Node.TEXT_NODE)
+    .map((n) => n.textContent)
+    .join(' ');
+  return direct.replace(/\s+/g, ' ').trim();
+}
+
+/** The link of an <li>, whether it's a direct child or wrapped in a <p>. */
+function itemLink(li) {
+  return li.querySelector(':scope > a, :scope > p > a');
 }
 
 /** Build a titled entry (title + optional description) for a dropdown. */
 function buildEntry(li) {
-  const link = li.querySelector(':scope > a');
+  const link = itemLink(li);
   if (!link) return null;
   const entry = document.createElement('a');
   entry.className = 'nav-dropdown-entry';
@@ -94,7 +123,7 @@ function buildDropdownPanel(sourceList) {
 
   const children = [...sourceList.children];
   const categoryGroups = children.filter((li) => li.querySelector(':scope > ul'));
-  const looseItems = children.filter((li) => !li.querySelector(':scope > ul') && li.querySelector(':scope > a'));
+  const looseItems = children.filter((li) => !li.querySelector(':scope > ul') && itemLink(li));
 
   if (categoryGroups.length > 0) {
     // --- Mega-menu: category columns + optional featured card ---
@@ -105,7 +134,7 @@ function buildDropdownPanel(sourceList) {
     categoryGroups.forEach((group) => {
       const col = document.createElement('div');
       col.className = 'nav-dropdown-category';
-      const headingText = group.childNodes[0] ? group.childNodes[0].textContent.trim() : '';
+      const headingText = ownLabel(group);
       if (headingText) {
         const h = document.createElement('h3');
         h.className = 'nav-dropdown-category-title';
@@ -127,7 +156,7 @@ function buildDropdownPanel(sourceList) {
     // Featured card (black promo tile) from a loose link item.
     const featured = looseItems[0];
     if (featured) {
-      const link = featured.querySelector(':scope > a');
+      const link = itemLink(featured);
       const card = document.createElement('a');
       card.className = 'nav-dropdown-featured';
       card.href = link.getAttribute('href');
@@ -150,7 +179,7 @@ function buildDropdownPanel(sourceList) {
     const list = document.createElement('div');
     list.className = 'nav-dropdown-list';
     looseItems.forEach((li) => {
-      const link = li.querySelector(':scope > a');
+      const link = itemLink(li);
       const a = document.createElement('a');
       a.className = 'nav-dropdown-simple-link';
       a.href = link.getAttribute('href');
@@ -173,31 +202,32 @@ function buildSections(listRoot) {
     item.className = 'nav-menu-item';
 
     const nestedList = li.querySelector(':scope > ul');
-    const directLink = li.querySelector(':scope > a');
+    const directLink = itemLink(li);
 
     if (nestedList) {
-      // Dropdown trigger (e.g. Trends) — a real <button> for keyboard/aria.
+      // Dropdown trigger (e.g. Trends, Support) — a real <button> for keyboard/aria.
+      // Label is the li's OWN text (via ownLabel), not the nested submenu text.
       item.classList.add('nav-drop');
-      const label = li.childNodes[0].textContent.trim();
       const trigger = document.createElement('button');
       trigger.type = 'button';
       trigger.className = 'nav-menu-link nav-drop-trigger';
       trigger.setAttribute('aria-expanded', 'false');
       trigger.setAttribute('aria-haspopup', 'true');
-      trigger.textContent = label;
+      trigger.textContent = ownLabel(li);
       item.append(trigger);
       item.append(buildDropdownPanel(nestedList));
     } else if (directLink) {
+      // Link item (e.g. About, Blog) — href resolved through the <p> wrapper.
       const a = document.createElement('a');
       a.className = 'nav-menu-link';
       a.href = directLink.getAttribute('href');
       a.textContent = directLink.textContent.trim();
       item.append(a);
     } else {
-      // Plain label with no link (e.g. Support).
+      // Plain label with no link and no submenu.
       const span = document.createElement('span');
       span.className = 'nav-menu-link';
-      span.textContent = li.textContent.trim();
+      span.textContent = ownLabel(li) || li.textContent.trim();
       item.append(span);
     }
     ul.append(item);
@@ -219,32 +249,24 @@ export default async function decorate(block) {
   const sourceSections = [...fragment.children]; // brand / sections / tools divs
 
   // --- Brand (left) ---
+  // The logo mark is inlined as SVG so it never depends on a published binary
+  // asset (external /icons/*.svg 404s on aem.page). Wordmark comes from content
+  // when present, else falls back to "Fashion Blog".
   const brand = document.createElement('div');
   brand.className = 'nav-brand';
   const brandSrc = sourceSections[0];
-  if (brandSrc) {
-    const link = brandSrc.querySelector('a');
-    if (link) {
-      const a = document.createElement('a');
-      a.className = 'nav-brand-link';
-      a.href = link.getAttribute('href');
-      const img = link.querySelector('img');
-      if (img) {
-        const logo = document.createElement('img');
-        logo.className = 'nav-brand-logo';
-        logo.src = img.getAttribute('src');
-        logo.alt = img.getAttribute('alt') || '';
-        logo.width = 32;
-        logo.height = 32;
-        a.append(logo);
-      }
-      const text = document.createElement('span');
-      text.className = 'nav-brand-text';
-      text.textContent = link.textContent.trim();
-      a.append(text);
-      brand.append(a);
-    }
-  }
+  const brandLink = brandSrc ? brandSrc.querySelector('a') : null;
+  const a = document.createElement('a');
+  a.className = 'nav-brand-link';
+  a.href = (brandLink && brandLink.getAttribute('href')) || '/';
+  // Inline star/compass mark (33x33 viewBox), inherits currentColor.
+  a.insertAdjacentHTML('afterbegin', '<svg class="nav-brand-logo" width="32" height="32" viewBox="0 0 33 33" aria-hidden="true" focusable="false"><path d="M28,0H5C2.24,0,0,2.24,0,5v23c0,2.76,2.24,5,5,5h23c2.76,0,5-2.24,5-5V5c0-2.76-2.24-5-5-5ZM29,17c-6.63,0-12,5.37-12,12h-1c0-6.63-5.37-12-12-12v-1c6.63,0,12-5.37,12-12h1c0,6.63,5.37,12,12,12v1Z" fill="currentColor"/></svg>');
+  const text = document.createElement('span');
+  text.className = 'nav-brand-text';
+  const brandText = brandLink ? brandLink.textContent.replace(/\s+/g, ' ').trim() : '';
+  text.textContent = brandText || 'Fashion Blog';
+  a.append(text);
+  brand.append(a);
 
   // --- Sections (center menu cluster) ---
   const sections = document.createElement('div');
